@@ -1,0 +1,122 @@
+[
+  {
+    "id": "eval_01_red_fox",
+    "title": "Autumn Ecology and Den Habits of the Red Fox",
+    "content": "The red fox (Vulpes vulpes) relies on underground dens in temperate forests during late autumn and winter seasons.",
+    "expected_subject": "red fox",
+    "expected_image_id": "img_red_fox_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_02_vulpes_vulpes_scientific",
+    "title": "Taxonomic Adaptations of Vulpes vulpes Across Woodlands",
+    "content": "Vulpes vulpes exhibits distinct vulpine hunting behaviors, hunting small rodents under thick autumn foliage.",
+    "expected_subject": "red fox",
+    "expected_image_id": "img_red_fox_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_03_fennec_fox",
+    "title": "Thermoregulation in Desert Fennec Foxes",
+    "content": "Fennec foxes (Vulpes zerda) possess oversized vascularized ears to radiate heat across arid Saharan desert dunes.",
+    "expected_subject": "fennec fox",
+    "expected_image_id": "img_fennec_fox_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_04_gray_wolf_pack",
+    "title": "Hunting Dynamics of Canis lupus in Alpine Winters",
+    "content": "Gray wolves (Canis lupus) operate in structured packs, patrolling large territorial ranges in snowy mountain environments.",
+    "expected_subject": "gray wolf",
+    "expected_image_id": "img_gray_wolf_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_05_domestic_dog",
+    "title": "Training and Socialization for Family Golden Retrievers",
+    "content": "Golden retrievers are gentle, obedient domestic canines that thrive with regular park exercise and family interaction.",
+    "expected_subject": "domestic dog",
+    "expected_image_id": "img_golden_retriever_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_06_grizzly_bear",
+    "title": "Grizzly Bears Foraging Along Alaskan Salmon Streams",
+    "content": "Ursus arctos brown bears gather near swift mountain rapids during the peak salmon migration run.",
+    "expected_subject": "grizzly bear",
+    "expected_image_id": "img_grizzly_bear_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_07_polar_bear",
+    "title": "Ursus maritimus: Marine Mammal of the Arctic Ice Sheet",
+    "content": "Polar bears depend on pack ice platforms to ambush ringed seals throughout the high Arctic archipelago.",
+    "expected_subject": "polar bear",
+    "expected_image_id": "img_polar_bear_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_08_giant_panda",
+    "title": "Dietary Specialization of Giant Pandas in Bamboo Sanctuaries",
+    "content": "Giant pandas consume over thirty pounds of fresh bamboo daily in mountain conservation reserves.",
+    "expected_subject": "giant panda",
+    "expected_image_id": "img_giant_panda_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_09_white_tailed_deer",
+    "title": "Herbivore Browsing Patterns of White-Tailed Deer",
+    "content": "White-tailed deer feed on tender browse in open meadows and woodland edges throughout North America.",
+    "expected_subject": "white-tailed deer",
+    "expected_image_id": "img_white_tailed_deer_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_10_elk_valley",
+    "title": "The Autumn Rut of Rocky Mountain Bull Elk",
+    "content": "Bull elk bugle across alpine valleys to assemble harems and challenge rival bulls during the fall mating season.",
+    "expected_subject": "elk",
+    "expected_image_id": "img_elk_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_11_african_lion",
+    "title": "Pride Hierarchy and Cooperative Hunting in African Lions",
+    "content": "African lions (Panthera leo) maintain complex social prides dominating the Serengeti savannah grasslands.",
+    "expected_subject": "african lion",
+    "expected_image_id": "img_african_lion_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_12_bengal_tiger",
+    "title": "Stalking Strategies of Panthera tigris in Mangrove Jungles",
+    "content": "Bengal tigers utilize their striped camouflage to ambush prey quietly through tall tropical grass and waterways.",
+    "expected_subject": "bengal tiger",
+    "expected_image_id": "img_bengal_tiger_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_13_bald_eagle",
+    "title": "Aerial Mastery and Nesting Habits of Bald Eagles",
+    "content": "Bald eagles build massive stick nests in tall pine trees overlooking glacial rivers and coastal estuaries.",
+    "expected_subject": "bald eagle",
+    "expected_image_id": "img_bald_eagle_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_14_datacenter_tech",
+    "title": "High-Density Server Architecture in Modern Cloud Datacenters",
+    "content": "Modern enterprise cloud data centers house high-density server racks and network switches delivering low latency compute.",
+    "expected_subject": "server rack datacenter",
+    "expected_image_id": "img_technology_datacenter_01",
+    "is_distractor": false
+  },
+  {
+    "id": "eval_15_quantum_unmatched",
+    "title": "Quantum Error Correction with Topological Anyons",
+    "content": "Topological quantum computing leverages non-abelian anyon braiding matrices to shield logical qubits from thermal decoherence.",
+    "expected_subject": null,
+    "expected_image_id": null,
+    "is_distractor": true
+  }
+]

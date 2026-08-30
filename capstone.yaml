@@ -1,0 +1,48 @@
+version: "1.0"
+name: flyrank-capstone-image-relevance
+description: AI Image Understanding & Content Matching Engine with Mismatch Guard
+language: python
+framework: fastapi
+
+commands:
+  run: "python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
+  seed: "python scripts/seed_corpus.py"
+  test: "pytest -v"
+  eval: "python eval/evaluate.py"
+
+base_url: "http://127.0.0.1:8000"
+
+endpoints:
+  health:
+    path: "/health"
+    method: "GET"
+  batch_ingest:
+    path: "/api/v1/jobs/ingest"
+    method: "POST"
+  job_status:
+    path: "/api/v1/jobs/{job_id}"
+    method: "GET"
+  list_images:
+    path: "/api/v1/images"
+    method: "GET"
+  flagged_images:
+    path: "/api/v1/images/flagged"
+    method: "GET"
+  post_suggestions:
+    path: "/api/v1/posts/{post_id}/suggestions"
+    method: "GET"
+  match_explain:
+    path: "/api/v1/match/explain"
+    method: "POST"
+  approve_suggestion:
+    path: "/api/v1/suggestions/{suggestion_id}/approve"
+    method: "POST"
+  reject_suggestion:
+    path: "/api/v1/suggestions/{suggestion_id}/reject"
+    method: "POST"
+  cost_analytics:
+    path: "/api/v1/analytics/costs"
+    method: "GET"
+  eval_run:
+    path: "/api/v1/eval/run"
+    method: "GET"
