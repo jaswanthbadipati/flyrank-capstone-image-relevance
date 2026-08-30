@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: flyrank-image-relevance-engine
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - AI_PROVIDER=offline
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
