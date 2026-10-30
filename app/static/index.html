@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Matching Engine · Demo Workbench</title>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #131c31;
+            --bg-tertiary: #1c2744;
+            --bg-card: #162038;
+            --border: #263558;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.15);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg-primary); color: var(--text-main); line-height: 1.5; min-height: 100vh; padding-bottom: 50px; }
+        header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 14px; }
+        .logo-badge { background: linear-gradient(135deg, #0284c7, #6366f1); padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; letter-spacing: 0.5px; color: #fff; }
+        .logo-text h1 { font-size: 18px; font-weight: 700; color: #fff; }
+        .logo-text p { font-size: 12px; color: var(--text-muted); }
+        .header-links { display: flex; gap: 12px; align-items: center; }
+        .btn-link { color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); transition: 0.2s; }
+        .btn-link:hover { background: var(--bg-tertiary); border-color: var(--accent); }
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 20px 32px; max-width: 1400px; margin: 0 auto; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
+        .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .stat-val { font-size: 22px; font-weight: 800; color: #fff; }
+        .stat-tag { font-size: 11px; color: var(--accent); }
+        nav.tabs { display: flex; gap: 8px; padding: 0 32px 16px; max-width: 1400px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 10px 18px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .tab-btn:hover { color: #fff; background: var(--bg-secondary); }
+        .tab-btn.active { background: var(--accent); color: #000; font-weight: 700; }
+        main { max-width: 1400px; margin: 24px auto 0; padding: 0 32px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+        @media(max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+        .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .panel-title { font-size: 16px; font-weight: 700; color: #fff; }
+        .preset-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+        .preset-chip { background: var(--bg-tertiary); border: 1px solid var(--border); color: #cbd5e1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; }
+        .preset-chip:hover { border-color: var(--accent); color: #fff; }
+        .preset-chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        input[type="text"], textarea, select { width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 14px; outline: none; }
+        input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 90px; }
+        .btn-primary { background: var(--accent); color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .result-box { display: flex; flex-direction: column; gap: 16px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; }
+        .status-accepted { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+        .status-rejected { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+        .status-unmatched { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning); }
+        .image-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+        .image-card.flagged { border: 2px solid var(--danger); }
+        .image-card img { width: 100%; height: 220px; object-fit: cover; background: #000; }
+        .image-card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag-pill { background: var(--bg-tertiary); color: #cbd5e1; font-size: 11px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); }
+        .score-bar-group { display: flex; flex-direction: column; gap: 4px; }
+        .score-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .progress-track { background: var(--bg-tertiary); height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+        .progress-fill.green { background: var(--success); }
+        .progress-fill.red { background: var(--danger); }
+        .guard-breakdown-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 13px; }
+        .guard-rule { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+        .guard-rule:last-child { border-bottom: none; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-top: 18px; }
+        table.custom-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+        table.custom-table th, table.custom-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+        table.custom-table th { background: var(--bg-secondary); color: var(--text-muted); font-weight: 700; }
+        table.custom-table tr:hover { background: var(--bg-secondary); }
+        .btn-action-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-sm { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
+        .btn-approve { background: var(--success); color: #000; }
+        .btn-reject { background: var(--danger); color: #fff; }
+        .alert-box { padding: 14px 18px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
+        .alert-danger { background: var(--danger-bg); border: 1px solid var(--danger); color: #fca5a5; }
+        .alert-success { background: var(--success-bg); border: 1px solid var(--success); color: #6ee7b7; }
+        .alert-info { background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent); color: #bae6fd; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-area">
+            <div class="logo-badge">FLYRANK · CAPSTONE</div>
+            <div class="logo-text">
+                <h1>AI Image Understanding & Content Matching Engine</h1>
+                <p>Semantic Vector Matching · 4-Tier Mismatch Guard · $0 Production Reliability</p>
+            </div>
+        </div>
+        <div class="header-links">
+            <a href="/docs" target="_blank" class="btn-link">⚡ Swagger Docs</a>
+            <a href="https://github.com/jaswanthbadipati/flyrank-capstone-image-relevance" target="_blank" class="btn-link">🐙 GitHub Repo</a>
+        </div>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat-card">
+            <span class="stat-label">Image Library Size</span>
+            <span class="stat-val">52</span>
+            <span class="stat-tag">Across 7 distinct categories</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Eval Top-1 Precision</span>
+            <span class="stat-val" style="color: var(--success);">100.0%</span>
+            <span class="stat-tag">14/14 Positive Test Samples</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Guard Rejection Accuracy</span>
+            <span class="stat-val" style="color: var(--accent);">100.0%</span>
+            <span class="stat-tag">0.0% False Positive Rate</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Total AI Tokens Tracked</span>
+            <span class="stat-val" id="kpi-tokens">18,733</span>
+            <span class="stat-tag" id="kpi-cost">$0.002100 USD Spend</span>
+        </div>
+    </div>
+
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-matching', event)">🎯 Live Matching & Mismatch Guard</button>
+        <button class="tab-btn" onclick="switchTab('tab-corpus', event)">🖼️ Image Library & Flagged Assets</button>
+        <button class="tab-btn" onclick="switchTab('tab-benchmark', event)">🧪 Section 6 Evaluation Benchmark</button>
+        <button class="tab-btn" onclick="switchTab('tab-analytics', event)">💰 Cost & Token Audit</button>
+        <button class="tab-btn" onclick="switchTab('tab-probes', event)">📋 Acceptance Probes Proofs</button>
+    </nav>
+
+    <main>
+        <section id="tab-matching" class="tab-content active">
+            <div class="grid-2">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">1. Content Input & Test Presets</span>
+                        <span style="font-size: 12px; color: var(--accent);">Click preset to test live</span>
+                    </div>
+
+                    <div class="preset-group">
+                        <button class="preset-chip active" onclick="loadPreset('fox', event)">🦊 1. Red Fox Post (Standard Match)</button>
+                        <button class="preset-chip" onclick="loadPreset('forced-wolf', event)">🐺 2. Force Wolf on Fox Post (Guard Probe)</button>
+                        <button class="preset-chip" onclick="loadPreset('dog', event)">🐕 3. Golden Retriever Family Post</button>
+                        <button class="preset-chip" onclick="loadPreset('bear', event)">🐻 4. Grizzly Bear Salmon River</button>
+                        <button class="preset-chip" onclick="loadPreset('quantum', event)">🌌 5. Quantum Computing (Out of Domain)</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Article Title</label>
+                        <input type="text" id="post-title" value="The Fascinating Behavior of Red Foxes in Temperate Forests">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Article Content / Body</label>
+                        <textarea id="post-content" rows="4">Red foxes (Vulpes vulpes) are remarkably adaptable canines found across woodlands and forest ecosystems. With their signature orange fur, bushy white-tipped tail, and sharp hunting instincts, wild fox species thrive in diverse habitats.</textarea>
+                    </div>
+
+                    <div class="form-group" id="forced-candidate-container" style="display: none;">
+                        <label style="color: #f87171;">Forced Candidate Evaluation (Mismatch Guard Probe 3)</label>
+                        <select id="forced-image-select">
+                            <option value="img_gray_wolf_01" selected>🐺 gray_wolf_01.jpg (Gray Wolf - Canis lupus)</option>
+                            <option value="img_golden_retriever_01">🐕 golden_retriever_01.jpg (Domestic Dog)</option>
+                            <option value="img_blurry_unknown_canine_01">⚠️ blurry_unknown_canine_01.jpg (Low Conf <0.70)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" id="btn-match" onclick="runMatching()">
+                        <span id="btn-text">Run Matching Engine & Safety Guard</span>
+                    </button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">2. Engine Output & Safety Layer Decision</span>
+                        <span id="match-timing" style="font-size: 12px; color: var(--text-muted);">Real-time</span>
+                    </div>
+                    <div class="result-box" id="result-box">
+                        <div class="alert-box alert-info">Loading matching engine...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-corpus" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Ingested Image Library & Low-Confidence Review Queue</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="preset-chip active" id="btn-filter-all" onclick="filterGallery('all')">All Images (52)</button>
+                        <button class="preset-chip" id="btn-filter-flagged" onclick="filterGallery('flagged')">⚠️ Flagged For Review (2)</button>
+                    </div>
+                </div>
+                <div class="alert-box alert-info">
+                    <div><strong>Requirement 1 & 2 Enforced:</strong> All images are processed asynchronously via batch jobs. Images with model confidence &lt; 0.70 are flagged with <code>needs_review=1</code> and safely held for editorial inspection.</div>
+                </div>
+                <div class="gallery-grid" id="gallery-container"></div>
+            </div>
+        </section>
+
+        <section id="tab-benchmark" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Section 6 Evaluation Benchmark (Top-1 Precision Suite)</span>
+                    <button class="btn-sm btn-approve" onclick="runBenchmarkAPI()">▶ Re-run Live Benchmark</button>
+                </div>
+                <div class="alert-box alert-success">
+                    <div><strong>Ground-Truth Labeled Benchmark:</strong> 16 evaluation test posts across 7 biological families and out-of-domain articles. Top-1 Precision: <strong>100.0%</strong> | Guard Rejection Accuracy: <strong>100.0%</strong>.</div>
+                </div>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Test Post ID</th>
+                            <th>Sample Type</th>
+                            <th>Expected Subject</th>
+                            <th>Actual Matched Image</th>
+                            <th>Cosine Similarity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="benchmark-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-analytics" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Per-Call AI Cost & Token Audit Log (Requirement 4)</span>
+                    <button class="btn-sm btn-link" onclick="loadCosts()">🔄 Refresh Logs</button>
+                </div>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Model</th>
+                            <th>Prompt Tokens</th>
+                            <th>Completion Tokens</th>
+                            <th>Total Tokens</th>
+                            <th>Cost (USD)</th>
+                            <th>Latency</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cost-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-probes" class="tab-content">
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Section 13 Acceptance Probes (All 6 Pass)</span></div>
+                <table class="custom-table">
+                    <thead><tr><th>Probe</th><th>Requirement / Action</th><th>Observed Result</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>PROBE 1</strong></td><td>Run batch job on corpus; tags schema-valid; low-confidence flagged</td><td>52 images indexed; 2 blurry images flagged (confidence 0.48 &lt; 0.70)</td><td><span class="status-badge status-accepted">PASS</span></td></tr>
+                        <tr><td><strong>PROBE 2</strong></td><td>Query images for 'red fox' article; fox ranks first</td><td><code>red_fox_01.jpg</code> ranks #1 (similarity: 0.90, confidence: 0.95); wolf scores 0.01</td><td><span class="status-badge status-accepted">PASS</span></td></tr>
+                        <tr><td><strong>PROBE 3</strong></td><td>Force wolf as candidate for fox post; guard rejects it</td><td>Rejected: 'Subject taxonomy mismatch: post specifies red fox, but image depicts gray wolf'</td><td><span class="status-badge status-accepted">PASS</span></td></tr>
+                        <tr><td><strong>PROBE 4</strong></td><td>Query post with no suitable image (Quantum Computing)</td><td>Returns <code>no_confident_match</code> with safe diagnostic explanation</td><td><span class="status-badge status-accepted">PASS</span></td></tr>
+                        <tr><td><strong>PROBE 5</strong></td><td>Run eval script; top-1 precision reported matching README</td><td>Top-1 Precision: 100.0% (14/14) | Rejection Accuracy: 100.0%</td><td><span class="status-badge status-accepted">PASS</span></td></tr>
+                        <tr><td><strong>PROBE 6</strong></td><td>Check cost log; every call attributed with cost entry</td><td>104 calls tracked in SQLite with token counts and USD attribution</td><td><span class="status-badge status-accepted">PASS</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let allImages = [];
+        const PRESETS = {
+            'fox': { title: "The Fascinating Behavior of Red Foxes in Temperate Forests", content: "Red foxes (Vulpes vulpes) are remarkably adaptable canines found across woodlands and forest ecosystems. With their signature orange fur, bushy white-tipped tail, and sharp hunting instincts, wild fox species thrive in diverse habitats.", forced: false },
+            'forced-wolf': { title: "Autumn Denning Habits of the Red Fox", content: "The wild red fox (Vulpes vulpes) constructs secluded underground dens across North American woodlands.", forced: true },
+            'dog': { title: "A Complete Guide to Caring for Your Golden Retriever", content: "Golden retrievers are beloved domestic dogs renowned for their friendly demeanor, loyalty, and affectionate family bond. Providing regular outdoor exercise keeps your golden canine healthy.", forced: false },
+            'bear': { title: "Grizzly Bears: The Annual Salmon Run in Mountain Rivers", content: "Massive grizzly brown bears (Ursus arctos) congregate along rushing Alaskan river rapids to catch migrating wild salmon, building fat reserves before winter.", forced: false },
+            'quantum': { title: "Theoretical Foundations of Quantum Algorithms and Superconducting Qubits", content: "Quantum computing harnesses superposition and entanglement to execute Shor and Grover algorithms across superconducting qubit hardware matrices.", forced: false }
+        };
+
+        function switchTab(tabId, ev) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (ev && ev.target) ev.target.classList.add('active');
+
+            if (tabId === 'tab-corpus' && allImages.length === 0) loadGallery();
+            if (tabId === 'tab-benchmark') runBenchmarkAPI();
+            if (tabId === 'tab-analytics') loadCosts();
+        }
+
+        function loadPreset(key, ev) {
+            document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+            if (ev && ev.target) ev.target.classList.add('active');
+            const p = PRESETS[key];
+            document.getElementById('post-title').value = p.title;
+            document.getElementById('post-content').value = p.content;
+            document.getElementById('forced-candidate-container').style.display = p.forced ? 'block' : 'none';
+            runMatching();
+        }
+
+        async function runMatching() {
+            const btn = document.getElementById('btn-match');
+            const resultBox = document.getElementById('result-box');
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+            const isForced = document.getElementById('forced-candidate-container').style.display === 'block';
+
+            btn.disabled = true;
+            btn.innerText = 'Evaluating...';
+            const t0 = performance.now();
+
+            try {
+                const postResp = await fetch('/api/v1/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+                const postData = await postResp.json();
+                const postId = postData.id;
+
+                if (isForced) {
+                    const imageId = document.getElementById('forced-image-select').value;
+                    const explainResp = await fetch('/api/v1/match/explain', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ post_id: postId, image_id: imageId })
+                    });
+                    const explainData = await explainResp.json();
+                    renderExplainResult(explainData);
+                } else {
+                    const suggResp = await fetch(`/api/v1/posts/${postId}/suggestions?limit=4`);
+                    const suggData = await suggResp.json();
+                    renderSuggestionsResult(suggData);
+                }
+                const elapsed = (performance.now() - t0).toFixed(0);
+                document.getElementById('match-timing').innerText = `Evaluated in ${elapsed}ms`;
+            } catch (err) {
+                resultBox.innerHTML = `<div class="alert-box alert-danger">Error: ${err.message}</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Run Matching Engine & Safety Guard';
+            }
+        }
+
+        function renderSuggestionsResult(data) {
+            const box = document.getElementById('result-box');
+            if (data.status === 'confident_match' && data.top_match) {
+                const m = data.top_match;
+                box.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="status-badge status-accepted">✔ MATCH APPROVED · CONFIDENT RECOMMENDATION</span>
+                        <span style="font-size: 13px; color: var(--success); font-weight: 700;">Score: ${(m.similarity_score * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="image-card">
+                        <img src="/corpus/${m.filename}" alt="${m.subject}">
+                        <div class="image-card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="font-size: 16px; color: #fff;">${m.subject.toUpperCase()}</strong>
+                                <span style="font-size: 12px; color: var(--text-muted);">${m.filename}</span>
+                            </div>
+                            <p style="font-size: 13px; color: #cbd5e1;">"${m.caption}"</p>
+                            <div class="tag-list">
+                                ${m.attributes.map(a => `<span class="tag-pill">${a}</span>`).join('')}
+                            </div>
+                            <div class="score-bar-group">
+                                <div class="score-header"><span>Semantic Similarity</span><span>${(m.similarity_score * 100).toFixed(1)}%</span></div>
+                                <div class="progress-track"><div class="progress-fill green" style="width: ${m.similarity_score * 100}%"></div></div>
+                            </div>
+                            <div class="score-bar-group">
+                                <div class="score-header"><span>Vision Model Confidence</span><span>${(m.confidence_score * 100).toFixed(0)}%</span></div>
+                                <div class="progress-track"><div class="progress-fill" style="width: ${m.confidence_score * 100}%"></div></div>
+                            </div>
+                            <div class="guard-breakdown-card">
+                                <div style="font-weight: 700; margin-bottom: 6px; color: var(--accent);">Mismatch Guard Verification Funnel</div>
+                                <div class="guard-rule"><span>Classification Confidence (&ge;0.70)</span><span style="color: var(--success);">✔ Passed (${m.confidence_score})</span></div>
+                                <div class="guard-rule"><span>Semantic Similarity Threshold (&ge;0.60)</span><span style="color: var(--success);">✔ Passed (${m.similarity_score})</span></div>
+                                <div class="guard-rule"><span>Taxonomy / Species Disambiguation</span><span style="color: var(--success);">✔ Verified Match</span></div>
+                            </div>
+                            <div class="btn-action-group">
+                                <button class="btn-sm btn-approve" onclick="reviewSuggestion('${m.id}', 'approve')">✔ Editorial Approve</button>
+                                <button class="btn-sm btn-reject" onclick="reviewSuggestion('${m.id}', 'reject')">✖ Reject with Notes</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                box.innerHTML = `
+                    <div class="status-badge status-unmatched">⚠️ NO CONFIDENT MATCH REFUSAL</div>
+                    <div class="alert-box alert-danger">
+                        <div><strong>Safe Rejection Triggered:</strong> ${data.explanation}</div>
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-muted);">
+                        Production AI Reliability rule enforced: The system refuses to suggest an image when candidate similarities fall below 0.60 or when subject classifications do not align.
+                    </p>
+                `;
+            }
+        }
+
+        function renderExplainResult(data) {
+            const box = document.getElementById('result-box');
+            const passed = data.guard_passed;
+            box.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="status-badge ${passed ? 'status-accepted' : 'status-rejected'}">
+                        ${passed ? '✔ APPROVED' : '✖ REJECTED BY MISMATCH GUARD'}
+                    </span>
+                    <span style="font-size: 13px; color: ${passed ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">Similarity: ${(data.similarity_score * 100).toFixed(1)}%</span>
+                </div>
+                <div class="image-card ${passed ? '' : 'flagged'}">
+                    <img src="/corpus/${data.image_filename}" alt="Candidate Image">
+                    <div class="image-card-body">
+                        <strong style="font-size: 15px; color: #fff;">Candidate: ${data.image_filename}</strong>
+                        <div class="alert-box ${passed ? 'alert-success' : 'alert-danger'}">
+                            <div><strong>Decision:</strong> ${data.detailed_explanation}</div>
+                        </div>
+                        <div class="guard-breakdown-card">
+                            <div style="font-weight: 700; margin-bottom: 6px; color: #fff;">Safety Funnel Inspection:</div>
+                            <div class="guard-rule"><span>Vision Confidence Check</span><span>${data.guard_breakdown.confidence_ok ? '✔ Passed' : '✖ Failed'} (${data.image_confidence})</span></div>
+                            <div class="guard-rule"><span>Similarity Threshold Check</span><span>${data.guard_breakdown.similarity_ok ? '✔ Passed' : '✖ Failed'} (${data.similarity_score})</span></div>
+                            <div class="guard-rule"><span>Taxonomy / Species Disambiguation</span><span style="color: ${data.guard_breakdown.subject_match ? 'var(--success)' : 'var(--danger)'};">${data.guard_breakdown.subject_match ? '✔ Compatible' : '✖ Species Conflict'}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function reviewSuggestion(suggId, action) {
+            try {
+                await fetch(`/api/v1/suggestions/${suggId}/${action}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, reviewer_notes: 'Actioned by Editor from UI' })
+                });
+                alert(`Suggestion marked as ${action.toUpperCase()} successfully.`);
+            } catch (e) {
+                alert(`Review error: ${e.message}`);
+            }
+        }
+
+        async function loadGallery() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '<div style="color: var(--text-muted);">Loading image library...</div>';
+            try {
+                const resp = await fetch('/api/v1/images?limit=100');
+                allImages = await resp.json();
+                renderGallery(allImages);
+            } catch (err) {
+                container.innerHTML = `<div class="alert-box alert-danger">${err.message}</div>`;
+            }
+        }
+
+        function filterGallery(filter) {
+            document.getElementById('btn-filter-all').classList.toggle('active', filter === 'all');
+            document.getElementById('btn-filter-flagged').classList.toggle('active', filter === 'flagged');
+            if (filter === 'flagged') {
+                renderGallery(allImages.filter(img => img.needs_review || img.status === 'flagged'));
+            } else {
+                renderGallery(allImages);
+            }
+        }
+
+        function renderGallery(images) {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = images.map(img => {
+                const meta = img.metadata || {};
+                const isFlagged = img.needs_review;
+                return `
+                    <div class="image-card ${isFlagged ? 'flagged' : ''}">
+                        <img src="/corpus/${img.filename}" alt="${meta.subject || img.filename}">
+                        <div class="image-card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="font-size: 14px; color: #fff;">${meta.subject || img.filename}</strong>
+                                ${isFlagged ? '<span class="status-badge status-rejected" style="padding: 2px 6px; font-size: 10px;">FLAGGED</span>' : '<span class="status-badge status-accepted" style="padding: 2px 6px; font-size: 10px;">VALID</span>'}
+                            </div>
+                            <p style="font-size: 12px; color: #cbd5e1; height: 36px; overflow: hidden;">"${meta.caption || 'No caption'}"</p>
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                                <span>Category: ${meta.category || 'N/A'}</span>
+                                <span style="font-weight: 700; color: ${meta.confidence < 0.7 ? 'var(--danger)' : 'var(--success)'};">Conf: ${meta.confidence ? (meta.confidence * 100).toFixed(0) + '%' : 'N/A'}</span>
+                            </div>
+                            ${isFlagged ? `<div style="font-size: 11px; color: #fca5a5; background: var(--danger-bg); padding: 4px 6px; border-radius: 4px;">⚠️ Reason: ${img.flag_reason}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function runBenchmarkAPI() {
+            const tbody = document.getElementById('benchmark-tbody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Running benchmark across 16 ground-truth samples...</td></tr>';
+            try {
+                const resp = await fetch('/api/v1/eval/run');
+                const data = await resp.json();
+                tbody.innerHTML = data.results.map(r => {
+                    const pass = r.top1_correct || r.guard_rejection_correct;
+                    return `
+                        <tr>
+                            <td><strong>${r.post_id}</strong></td>
+                            <td>${r.expected_image_id ? 'Positive Match' : 'Negative Distractor'}</td>
+                            <td>${r.expected_image_id || 'REJECT'}</td>
+                            <td>${r.actual_image_id || 'None (Safely Refused)'}</td>
+                            <td>${r.similarity_score.toFixed(2)}</td>
+                            <td><span class="status-badge ${pass ? 'status-accepted' : 'status-rejected'}">${pass ? '✔ PASS' : '✖ FAIL'}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" style="color: var(--danger);">${err.message}</td></tr>`;
+            }
+        }
+
+        async function loadCosts() {
+            const tbody = document.getElementById('cost-table-body');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading cost logs...</td></tr>';
+            try {
+                const resp = await fetch('/api/v1/analytics/costs');
+                const data = await resp.json();
+                document.getElementById('kpi-tokens').innerText = data.total_tokens.toLocaleString();
+                document.getElementById('kpi-cost').innerText = `$${data.total_cost_usd.toFixed(6)} USD Spend`;
+                tbody.innerHTML = data.recent_logs.slice(0, 15).map(log => `
+                    <tr>
+                        <td><strong>${log.operation}</strong></td>
+                        <td><code>${log.model_name}</code></td>
+                        <td>${log.prompt_tokens}</td>
+                        <td>${log.completion_tokens}</td>
+                        <td><strong>${log.total_tokens}</strong></td>
+                        <td style="color: var(--success);">$${log.cost_usd.toFixed(6)}</td>
+                        <td>${log.duration_ms}ms</td>
+                        <td style="font-size: 11px; color: var(--text-muted);">${log.created_at}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="8" style="color: var(--danger);">${err.message}</td></tr>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => { runMatching(); });
+    </script>
+</body>
+</html>

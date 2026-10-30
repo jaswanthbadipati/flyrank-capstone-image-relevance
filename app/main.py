@@ -1,9 +1,11 @@
 """FastAPI Application Main Entrypoint."""
 import logging
+from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import init_db
@@ -68,51 +70,20 @@ def health_check():
         "gemini_configured": bool(settings.GEMINI_API_KEY)
     }
 
-@app.get("/", response_class=HTMLResponse, tags=["Dashboard"])
+# Mount static assets & corpus images
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+if settings.CORPUS_DIR.exists():
+    app.mount("/corpus", StaticFiles(directory=str(settings.CORPUS_DIR)), name="corpus")
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+@app.get("/", response_class=FileResponse, tags=["Dashboard"])
 def home():
-    """Minimal admin table and status overview."""
-    return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>AI Image Matching Engine</title>
-        <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; background: #0f172a; color: #f8fafc; }
-            h1 { color: #38bdf8; }
-            .card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #334155; }
-            a { color: #38bdf8; text-decoration: none; font-weight: bold; }
-            a:hover { text-decoration: underline; }
-            .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; background: #0284c7; color: white; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { text-align: left; padding: 10px; border-bottom: 1px solid #334155; }
-            th { color: #94a3b8; }
-        </style>
-    </head>
-    <body>
-        <h1>AI Image Understanding & Content Matching Engine</h1>
-        <div class="card">
-            <span class="badge">Operational</span>
-            <p>Production AI reliability engine with a 4-tier <strong>Mismatch Guard</strong> safety layer.</p>
-            <p>Access the interactive Swagger UI documentation at <a href="/docs">/docs</a> or OpenAPI specification at <a href="/openapi.json">/openapi.json</a>.</p>
-        </div>
-        <div class="card">
-            <h2>Key Engine Endpoints</h2>
-            <table>
-                <thead>
-                    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>GET</td><td><a href="/api/v1/images">/api/v1/images</a></td><td>Image inventory & extracted structured metadata</td></tr>
-                    <tr><td>GET</td><td><a href="/api/v1/images/flagged">/api/v1/images/flagged</a></td><td>Flagged low-confidence / review-required images</td></tr>
-                    <tr><td>GET</td><td><a href="/api/v1/posts">/api/v1/posts</a></td><td>Blog post catalogue & target subjects</td></tr>
-                    <tr><td>GET</td><td><a href="/api/v1/analytics/costs">/api/v1/analytics/costs</a></td><td>Token consumption & USD cost attribution</td></tr>
-                    <tr><td>GET</td><td><a href="/api/v1/eval/run">/api/v1/eval/run</a></td><td>Live Top-1 precision evaluation benchmark</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    """
+    """Interactive AI Matching Engine & Mismatch Guard Demo Workbench."""
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return HTMLResponse("<h1>AI Image Understanding & Content Matching Engine</h1>")
 
 if __name__ == "__main__":
     import uvicorn
